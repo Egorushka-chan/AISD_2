@@ -12,18 +12,7 @@ numbers_dictionary = { # для вывода прописью
     '8': 'восемь',
 }
 
-dividers_list = {  # разделители слов
-    '',
-    ' ',
-    ','
-    '.',
-    '   ',
-    '\n',
-    '-',
-    '_',
-    ':'
-}
-
+word_divide_regex = re.compile('\s|\W ') # разделители слов
 general_regex = re.compile('^\d?7\d{4}$')
 even_regex = re.compile('[02468]')
 split_regex = re.compile('7\d{4}$')
@@ -33,7 +22,7 @@ with open("numbers.txt", 'r') as file:
     file_body = file.read()
     if file_body:
         has_requied_value = False
-        file_values = file_body.split()
+        file_values = word_divide_regex.split(file_body)
         for raw_value in file_values:
             if raw_value:
                 value_match = general_regex.search(raw_value) # проверка
