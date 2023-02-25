@@ -3,19 +3,13 @@
 Выводит на экран четные цифры стоящие в числе справа от этой 7 (прописью).
 """
 import re
-regex = re.compile('^\d?7\d{4}$')
 
-numbers_dictionary = {
+numbers_dictionary = { # для вывода прописью
     '0': 'ноль',
-    '1': 'один',
     '2': 'два',
-    '3': 'три',
     '4': 'четыре',
-    '5': 'пять',
     '6': 'шесть',
-    '7': 'семь',
     '8': 'восемь',
-    '9': 'девять'
 }
 
 dividers_list = {  # разделители слов
@@ -30,45 +24,37 @@ dividers_list = {  # разделители слов
     ':'
 }
 
-
-def read_block(file):
-    symbol = file.read(1)
-    result = ''
-    while symbol not in dividers_list:
-        result += symbol
-        symbol = file.read(1)
-
-    if symbol == '':  # проверка на конец файла
-        return result, True
-    else:
-        return result, False
+general_regex = re.compile('^\d?7\d{4}$')
+even_regex = re.compile('[02468]')
+split_regex = re.compile('7\d{4}$')
 
 
 with open("numbers.txt", 'r') as file:
-    result = read_block(file)
-    raw_value = result[0]
-    end_of_file = result[1]
+    file_body = file.read()
+    if file_body:
+        has_requied_value = False
+        file_values = file_body.split()
+        for raw_value in file_values:
+            if raw_value:
+                value_match = general_regex.search(raw_value) # проверка
+                if value_match:  # если регулярка прошла
+                    splited_value = split_regex.findall(raw_value)
+                    result = splited_value[0] # берем правую часть
 
-    while end_of_file == False:
-        if raw_value:
-            # проверка
-            passed = regex.search(raw_value)
+                    result_chars = []
+                    for char in result:
+                        if even_regex.search(char):
+                            result_chars.append(char)
 
-            if passed:  # вывод четных чисел
-                selected_values = raw_value[-4:]
-                result_values = []
-                for value in selected_values:
-                    if int(value) % 2 == 0:
-                        result_values.append(value)
-
-                result_string = ''
-                for result_value in result_values:
-                    result_string += numbers_dictionary[result_value] + " "
-                if result_string != '':
-                    print(f"{raw_value}: {result_string}")
-
-        result = read_block(file)
-        raw_value = result[0]
-        end_of_file = result[1]
+                    result_string = ''
+                    for result_char in result_chars:
+                        result_string += numbers_dictionary[result_char] + " "
+                    if result_string != '':
+                        has_requied_value = True
+                        print(f"{raw_value}: {result_string}")
+        if not has_requied_value:
+            print('В файле отсутствуют подходящие значения')
     else:
-        print('файл пустой')
+        print('Файл пустой')
+
+
